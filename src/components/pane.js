@@ -1,3 +1,5 @@
+const {zeroOrientedFloor} = require('../utils/floor.js');
+
 function flexiPane({onGridx, onGridy, onGridWidth, onGridHeight}) {
   let _onGridx = typeof onGridx === 'number' ? onGridx : 0;
   let _onGridy = typeof onGridy === 'number' ? onGridy : 0;
@@ -5,14 +7,6 @@ function flexiPane({onGridx, onGridy, onGridWidth, onGridHeight}) {
   let _onGridHeight = _validGridHeight(typeof onGridHeight === 'number' ? onGridHeight : 2);
   let _gridInstance = null;
   let _ownId = null;
-
-  function _intCloseToZero(number) {
-    if (number >= 0) {
-      return Math.floor(number);
-    } else {
-      return -Math.floor(-number);
-    }
-  }
 
   function _validGridWidth(gridWidth) {
     return (gridWidth < 1) ? 1 : gridWidth;
@@ -136,8 +130,8 @@ function flexiPane({onGridx, onGridy, onGridWidth, onGridHeight}) {
     const gridParams = _gridInstance.getGridParams();
     const [gridPickPointx, gridPickPointy] = _gridInstance.grid_getxyOfPoint([pxPickPointx, pxPickPointy]);
     const [gridOffsetToTopLeftx, gridOffsetToTopLefty] = [
-      _intCloseToZero(pxOffsetToTopLeftx / (cellSize[0] + gridParams.gap)),
-      _intCloseToZero(pxOffsetToTopLefty / (cellSize[1] + gridParams.gap)),
+      zeroOrientedFloor(pxOffsetToTopLeftx / (cellSize[0] + gridParams.gap)),
+      zeroOrientedFloor(pxOffsetToTopLefty / (cellSize[1] + gridParams.gap)),
     ];
     grid_setxy([
       gridPickPointx + gridOffsetToTopLeftx,
@@ -150,8 +144,8 @@ function flexiPane({onGridx, onGridy, onGridWidth, onGridHeight}) {
     const gridParams = _gridInstance.getGridParams();
     const [gridPickPointx, gridPickPointy] = _gridInstance.grid_getxyOfPoint([pxPickPointx, pxPickPointy]);
     const [gridOffsetToBottomRightx, gridOffsetToBottomRighty] = [
-      _intCloseToZero(pxOffsetToBottomRightx / (cellSize[0] + gridParams.gap)),
-      _intCloseToZero(pxOffsetToBottomRighty / (cellSize[1] + gridParams.gap)),
+      zeroOrientedFloor(pxOffsetToBottomRightx / (cellSize[0] + gridParams.gap)),
+      zeroOrientedFloor(pxOffsetToBottomRighty / (cellSize[1] + gridParams.gap)),
     ];
     const [gridTopLeftx, gridTopLefty] = grid_getxy();
     const [gridBottomRightx, gridBottomRighty] = [
