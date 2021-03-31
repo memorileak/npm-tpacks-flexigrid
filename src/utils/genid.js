@@ -3,7 +3,7 @@ let asciiDecoder = null;
 if (window.TextDecoder) {
   asciiDecoder = new window.TextDecoder('ascii');
 } else {
-  console.error('GenID: No Text decoder in this browser');
+  throw new Error('GenID: No Text decoder in this browser');
 }
 
 module.exports = {
