@@ -36,7 +36,7 @@ export interface FlexiPane {
   ): void,
 }
 
-export type FlexiPaneFactory = (paneParams: FlexiPaneParams) => FlexiPane;
+export type FlexiPaneFactory = ({onGridx, onGridy, onGridWidth, onGridHeight}: FlexiPaneParams) => FlexiPane;
 export const flexiPane: FlexiPaneFactory;
 
 
@@ -79,5 +79,5 @@ export interface FlexiGrid {
   hasPreviewCollision(): boolean,
 }
 
-export type FlexiGridFactory = (gridParams: FlexiGridParams) => FlexiGrid;
+export type FlexiGridFactory = ({width, cols, rowHeight, gap}: FlexiGridParams) => FlexiGrid;
 export const flexiGrid: FlexiGridFactory;
