@@ -50,7 +50,7 @@ export interface FlexiGridParams {
 export interface FlexiGrid {
   getGridParams(): FlexiGridParams,
   getPaneIds(): Array<string>,
-  getPane(): FlexiPane,
+  getPane(paneId: string): FlexiPane,
   getPreviewPane(): FlexiPane,
   setPreviewPane(previewPane: FlexiPane): string,
   attachPreview(paneInstance: FlexiPane): void,
