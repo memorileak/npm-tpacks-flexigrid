@@ -1,12 +1,29 @@
 const {zeroOrientedFloor} = require('../utils/floor.js');
 
 function flexiPane({onGridx, onGridy, onGridWidth, onGridHeight}) {
-  let _onGridx = typeof onGridx === 'number' ? onGridx : 0;
-  let _onGridy = typeof onGridy === 'number' ? onGridy : 0;
+  let _onGridx = _validGridx(typeof onGridx === 'number' ? onGridx : 0);
+  let _onGridy = _validGridy(typeof onGridy === 'number' ? onGridy : 0);
   let _onGridWidth = _validGridWidth(typeof onGridWidth === 'number' ? onGridWidth : 2);
   let _onGridHeight = _validGridHeight(typeof onGridHeight === 'number' ? onGridHeight : 2);
   let _gridInstance = null;
   let _ownId = null;
+
+  function _validGridx(gridx) {
+    const gridParams = _gridInstance.getGridParams();
+    if (gridx < 0) {
+      return 0;
+    } else if (gridx + _onGridWidth > gridParams.cols) {
+      return gridParams.cols - _onGridWidth;
+    }
+    return gridx;
+  }
+
+  function _validGridy(gridy) {
+    if (gridy < 0) {
+      return 0;
+    }    
+    return gridx;
+  }
 
   function _validGridWidth(gridWidth) {
     return (gridWidth < 1) ? 1 : gridWidth;
@@ -26,8 +43,8 @@ function flexiPane({onGridx, onGridy, onGridWidth, onGridHeight}) {
   }
 
   function fitToSlot() {
-    _onGridx = Math.round(_onGridx);
-    _onGridy = Math.round(_onGridy);
+    _onGridx = _validGridx(Math.round(_onGridx));
+    _onGridy = _validGridy(Math.round(_onGridy));
     _onGridWidth = _validGridWidth(Math.round(_onGridWidth));
     _onGridHeight = _validGridHeight(Math.round(_onGridHeight));
   }
@@ -62,8 +79,8 @@ function flexiPane({onGridx, onGridy, onGridWidth, onGridHeight}) {
     if (typeof pxx === 'number' && typeof pxy === 'number') {
       const cellSize = _gridInstance.px_getCellSize();
       const gridParams = _gridInstance.getGridParams();
-      _onGridx = pxx / (cellSize[0] + gridParams.gap);
-      _onGridy = pxy / (cellSize[1] + gridParams.gap);
+      _onGridx = _validGridx(pxx / (cellSize[0] + gridParams.gap));
+      _onGridy = _validGridy(pxy / (cellSize[1] + gridParams.gap));
     } else {
       console.error('Pane.px_setxy: x, y must be numbers');
     }
@@ -109,8 +126,8 @@ function flexiPane({onGridx, onGridy, onGridWidth, onGridHeight}) {
 
   function grid_setxy([onGridx, onGridy]) {
     if (typeof onGridx === 'number' && typeof onGridy === 'number') {
-      _onGridx = onGridx;
-      _onGridy = onGridy;
+      _onGridx = _validGridx(onGridx);
+      _onGridy = _validGridy(onGridy);
     } else {
       console.error('Pane.grid_setxy: x, y must be numbers');
     }
