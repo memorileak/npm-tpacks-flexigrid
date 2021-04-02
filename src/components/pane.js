@@ -19,7 +19,7 @@ function flexiPane({onGridx, onGridy, onGridWidth, onGridHeight}) {
     if (gridy < 0) {
       return 0;
     }    
-    return gridx;
+    return gridy;
   }
 
   function _validGridWidth(gridWidth) {
