@@ -44,18 +44,23 @@ function flexiGrid({width, cols, rowHeight, gap}) {
 
   function setPreviewPane(previewPane) {
     const previewPaneId = genid();
+    previewPane.increaseZIndexLevel();
     _previewPane = previewPane;
     previewPane.belongsToGrid(gridInstance, previewPaneId);
     return previewPaneId;
   }
 
   function attachPreview(paneInstance) {
+    paneInstance.increaseZIndexLevel();
+    paneInstance.increaseZIndexLevel();
     _paneInPreview = paneInstance;
     _previewPane.grid_setxy(paneInstance.grid_getxy());
     _previewPane.grid_setWidthHeight(paneInstance.grid_getWidthHeight());
   }
 
   function detachPreview() {
+    _paneInPreview.decreaseZIndexLevel();
+    _paneInPreview.decreaseZIndexLevel();
     _paneInPreview = null;
   }
 

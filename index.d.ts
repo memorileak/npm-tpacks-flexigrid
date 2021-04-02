@@ -7,8 +7,11 @@ export interface FlexiPaneParams {
 
 export interface FlexiPane {
   getId(): string,
+  getZIndexLevel(): number,
   belongsToGrid(gridInstance: FlexiGrid, ownId: string): void,
   fitToSlot(): void,
+  increaseZIndexLevel(): void,
+  decreaseZIndexLevel(): void,
   px_getxy(): [number, number],
   px_getWidthHeight(): [number, number],
   px_getBottomRightxy(): [number, number],

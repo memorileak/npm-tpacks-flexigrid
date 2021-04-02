@@ -5,6 +5,7 @@ function flexiPane({onGridx, onGridy, onGridWidth, onGridHeight}) {
   let _onGridy = _validGridy(typeof onGridy === 'number' ? onGridy : 0);
   let _onGridWidth = _validGridWidth(typeof onGridWidth === 'number' ? onGridWidth : 2);
   let _onGridHeight = _validGridHeight(typeof onGridHeight === 'number' ? onGridHeight : 2);
+  let _zIndexLevel = 0;
   let _gridInstance = null;
   let _ownId = null;
 
@@ -34,6 +35,10 @@ function flexiPane({onGridx, onGridy, onGridWidth, onGridHeight}) {
     return _ownId;
   }
 
+  function getZIndexLevel() {
+    return _zIndexLevel;
+  }
+
   function belongsToGrid(gridInstance, ownId) {
     _gridInstance = gridInstance;
     _ownId = ownId;
@@ -44,6 +49,16 @@ function flexiPane({onGridx, onGridy, onGridWidth, onGridHeight}) {
     _onGridy = _validGridy(Math.round(_onGridy));
     _onGridWidth = _validGridWidth(Math.round(_onGridWidth));
     _onGridHeight = _validGridHeight(Math.round(_onGridHeight));
+  }
+
+  function increaseZIndexLevel() {
+    _zIndexLevel += 1;
+  }
+
+  function decreaseZIndexLevel() {
+    if (_zIndexLevel > 0) {
+      _zIndexLevel -= 1;
+    }
   }
 
   function px_getxy() {
@@ -174,8 +189,11 @@ function flexiPane({onGridx, onGridy, onGridWidth, onGridHeight}) {
 
   return {
     getId,
+    getZIndexLevel,
     belongsToGrid,
     fitToSlot,
+    increaseZIndexLevel,
+    decreaseZIndexLevel,
     px_getxy,
     px_getWidthHeight,
     px_getBottomRightxy,
