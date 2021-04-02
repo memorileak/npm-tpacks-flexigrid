@@ -9,12 +9,9 @@ function flexiPane({onGridx, onGridy, onGridWidth, onGridHeight}) {
   let _ownId = null;
 
   function _validGridx(gridx) {
-    const gridParams = _gridInstance.getGridParams();
     if (gridx < 0) {
       return 0;
-    } else if (gridx + _onGridWidth > gridParams.cols) {
-      return gridParams.cols - _onGridWidth;
-    }
+    }    
     return gridx;
   }
 
