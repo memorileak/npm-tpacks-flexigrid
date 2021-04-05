@@ -179,6 +179,7 @@ function flexiGrid({widthByPixel, numberOfColumns, rowHeightByPixel, gapByPixel}
   const gridInstance = {
     calculateVectorByPixelOfPixels,
     calculateVectorByGridCellOfPixels,
+
     getGridData,
     getPaneIds,
     getPane,
@@ -187,6 +188,7 @@ function flexiGrid({widthByPixel, numberOfColumns, rowHeightByPixel, gapByPixel}
     getGridHeightByPixel,
     getXYByGridCellOfPixel,
     getGridHeightByGridCell,
+
     setPreviewPane,
     attachPreview,
     detachPreview,

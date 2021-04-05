@@ -196,6 +196,7 @@ function flexiPane({xByGridCell, yByGridCell, widthByGridCell, heightByGridCell}
     getBottomRightXYByPixel,
     getXYByGridCell,
     getWidthHeightByGridCell,
+
     belongsToGrid,
     fitToSlot,
     increaseZIndexLevel,
