@@ -63,7 +63,7 @@ function flexiGrid({widthByPixel, numberOfColumns, rowHeightByPixel, gapByPixel}
   function getGridHeightByPixel() {
     let maxHeightByPixel = 0;
     for (let i = 0; i < thisPaneIds.length; i += 1) {
-      const [, bottomRightYByPixel] = getPane(thisPaneIds[i]).px_getBottomRightxy();
+      const [, bottomRightYByPixel] = getPane(thisPaneIds[i]).getBottomRightXYByPixel();
       maxHeightByPixel = (maxHeightByPixel < bottomRightYByPixel) ? bottomRightYByPixel : maxHeightByPixel;
     }
     return maxHeightByPixel;
