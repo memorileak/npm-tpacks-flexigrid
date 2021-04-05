@@ -1,51 +1,120 @@
 const {genid} = require('../utils/genid');
 
-function flexiGrid({width, cols, rowHeight, gap}) {
-  let _width = typeof width === 'number' ? width : 1280;
-  let _cols = typeof cols === 'number' ? cols : 24;
-  let _rowHeight = typeof rowHeight === 'number' ? rowHeight : 80;
-  let _gap = typeof gap === 'number' ? gap : 5;
-  let _previewPane = null;
-  let _paneInPreview = null;
-  const _paneIds = [];
-  const _paneInstances = {};
+function flexiGrid({widthByPixel, numberOfColumns, rowHeightByPixel, gapByPixel}) {
+  let thisWidthByPixel = typeof widthByPixel === 'number' ? widthByPixel : 1280;
+  let thisNumberOfColumns = typeof numberOfColumns === 'number' ? numberOfColumns : 24;
+  let thisRowHeightByPixel = typeof rowHeightByPixel === 'number' ? rowHeightByPixel : 80;
+  let thisGapByPixel = typeof gapByPixel === 'number' ? gapByPixel : 5;
+  let thisPreviewPane = null;
+  let thisPanePreviewing = null;
+  const thisPaneIds = [];
+  const thisPaneInstances = {};
 
-  function isTwoPanesCollided(paneInstance1, paneInstance2) {
-    const [x1, y1] = paneInstance1.grid_getxy();
-    const [w1, h1] = paneInstance1.grid_getWidthHeight();
-    const [x2, y2] = paneInstance2.grid_getxy();
-    const [w2, h2] = paneInstance2.grid_getWidthHeight();
+  function isTwoPanesCollided(sourcePaneInstance, destPaneInstance) {
+    const [sourceXByGridCell, sourceYByGridCell] = sourcePaneInstance.getXYByGridCell();
+    const [sourceWidthByGridCell, sourceHeightByGridCell] = sourcePaneInstance.getWidthHeightByGridCell();
+    const [destXByGridCell, destYByGridCell] = destPaneInstance.getXYByGridCell();
+    const [destWidthByGridCell, destHeightByGridCell] = destPaneInstance.getWidthHeightByGridCell();
     return (
-      x1 <= x2 + w2 - 1 && x1 + w1 - 1 >= x2
-      && y1 <= y2 + h2 - 1 && y1 + h1 - 1 >= y2
+      sourceXByGridCell <= destXByGridCell + destWidthByGridCell - 1 
+      && sourceXByGridCell + sourceWidthByGridCell - 1 >= destXByGridCell
+      && sourceYByGridCell <= destYByGridCell + destHeightByGridCell - 1 
+      && sourceYByGridCell + sourceHeightByGridCell - 1 >= destYByGridCell
     );
   }
 
-  function getGridParams() {
+  function calculateVectorByPixelOfPixels([sourceXByPixel, sourceYByPixel], [destXByPixel, destYByPixel]) {
+    return [destXByPixel - sourceXByPixel, destYByPixel - sourceYByPixel];
+  }
+
+  function calculateVectorByGridCellOfPixels([sourceXByPixel, sourceYByPixel], [destXByPixel, destYByPixel]) {
+    const [sourceXByGridCell, sourceYByGridCell] = getXYByGridCellOfPixel([sourceXByPixel, sourceYByPixel]);
+    const [destXByGridCell, destYByGridCell] = getXYByGridCellOfPixel([destXByPixel, destYByPixel]);
+    return [destXByGridCell - sourceXByGridCell, destYByGridCell - sourceYByGridCell];
+  }
+
+  function getGridData() {
     return {
-      width: _width,
-      cols: _cols,
-      rowHeight: _rowHeight,
-      gap: _gap,
+      widthByPixel: thisWidthByPixel,
+      numberOfColumns: thisNumberOfColumns,
+      rowHeightByPixel: thisRowHeightByPixel,
+      gapByPixel: thisGapByPixel,
     };
   }
 
   function getPaneIds() {
-    return [..._paneIds];
+    return [...thisPaneIds];
   }
 
   function getPane(paneId) {
-    return _paneInstances[paneId] || null;
+    return thisPaneInstances[paneId] || null;
   }
 
   function getPreviewPane() {
-    return _previewPane;
+    return thisPreviewPane;
+  }
+
+  function getCellSizeByPixel() {
+    const cellWidthByPixel = (thisWidthByPixel - thisGapByPixel * (thisNumberOfColumns - 1)) / thisNumberOfColumns;
+    const cellHeightByPixel = thisRowHeightByPixel;
+    return [cellWidthByPixel, cellHeightByPixel];
+  }
+
+  function getGridHeightByPixel() {
+    let maxHeightByPixel = 0;
+    for (let i = 0; i < thisPaneIds.length; i += 1) {
+      const [, bottomRightYByPixel] = getPane(thisPaneIds[i]).px_getBottomRightxy();
+      maxHeightByPixel = (maxHeightByPixel < bottomRightYByPixel) ? bottomRightYByPixel : maxHeightByPixel;
+    }
+    return maxHeightByPixel;
+  }
+
+  function getGridHeightByGridCell() {
+    const [, maxYByGridCell] = getXYByGridCellOfPixel([0, getGridHeightByPixel()]);
+    return maxYByGridCell + 1;
+  }
+
+  function getXYByGridCellOfPixel([xByPixel, yByPixel]) {
+    const cellSizeByPixel = getCellSizeByPixel();
+    const xByGridCell = Math.floor(xByPixel / (cellSizeByPixel[0] + thisGapByPixel));
+    const yByGridCell = Math.floor(yByPixel / (cellSizeByPixel[1] + thisGapByPixel));
+    return [xByGridCell, yByGridCell];
+  }
+
+  function setGridParameter({widthByPixel, numberOfColumns, rowHeightByPixel, gapByPixel}) {
+    if (typeof widthByPixel === 'number') {
+      thisWidthByPixel = widthByPixel;
+    }
+    if (typeof numberOfColumns === 'number') {
+      thisNumberOfColumns = numberOfColumns;
+    }
+    if (typeof rowHeightByPixel === 'number') {
+      thisRowHeightByPixel = rowHeightByPixel;
+    }
+    if (typeof gapByPixel === 'number') {
+      thisGapByPixel = gapByPixel;
+    }
+  }
+
+  function addPane(newPane) {
+    const paneId = genid();
+    thisPaneIds.push(paneId);
+    thisPaneInstances[paneId] = newPane;
+    newPane.belongsToGrid(gridInstance, paneId);
+    return paneId;
+  }
+
+  function removePane(paneId) {
+    const paneIdIndex = thisPaneIds.findIndex((id) => id === paneId);
+    thisPaneIds.splice(paneIdIndex, 1);
+    thisPaneInstances[paneId].belongsToGrid(null, null);
+    delete thisPaneInstances[paneId];
   }
 
   function setPreviewPane(previewPane) {
     const previewPaneId = genid();
     previewPane.increaseZIndexLevel();
-    _previewPane = previewPane;
+    thisPreviewPane = previewPane;
     previewPane.belongsToGrid(gridInstance, previewPaneId);
     return previewPaneId;
   }
@@ -53,96 +122,31 @@ function flexiGrid({width, cols, rowHeight, gap}) {
   function attachPreview(paneInstance) {
     paneInstance.increaseZIndexLevel();
     paneInstance.increaseZIndexLevel();
-    _paneInPreview = paneInstance;
-    _previewPane.grid_setxy(paneInstance.grid_getxy());
-    _previewPane.grid_setWidthHeight(paneInstance.grid_getWidthHeight());
+    thisPanePreviewing = paneInstance;
+    thisPreviewPane.setXYByGridCell(paneInstance.getXYByGridCell());
+    thisPreviewPane.setWidthHeightByGridCell(paneInstance.getWidthHeightByGridCell());
   }
 
   function detachPreview() {
-    _paneInPreview.decreaseZIndexLevel();
-    _paneInPreview.decreaseZIndexLevel();
-    _paneInPreview = null;
-  }
-
-  function px_getCellSize() {
-    const cellWidth = (_width - _gap * (_cols - 1)) / _cols;
-    const cellHeight = _rowHeight;
-    return [cellWidth, cellHeight];
-  }
-
-  function px_getGridHeight() {
-    let height = 0;
-    for (let i = 0; i < _paneIds.length; i += 1) {
-      const [, bry] = getPane(_paneIds[i]).px_getBottomRightxy();
-      height = (height < bry) ? bry : height;
-    }
-    return height;
-  }
-
-  function px_calVector([pxFromx, pxFromy], [pxTox, pxToy]) {
-    return [pxTox - pxFromx, pxToy - pxFromy];
-  }
-
-  function grid_getxyOfPoint([pxx, pxy]) {
-    const cellSize = px_getCellSize();
-    const gridx = Math.floor(pxx / (cellSize[0] + _gap));
-    const gridy = Math.floor(pxy / (cellSize[1] + _gap));
-    return [gridx, gridy];
-  }
-
-  function grid_getGridHeight() {
-    const [, gridMaxy] = grid_getxyOfPoint([0, px_getGridHeight()]);
-    return gridMaxy + 1;
-  }
-
-  function grid_calVector([pxFromx, pxFromy], [pxTox, pxToy]) {
-    const [gridFromx, gridFromy] = grid_getxyOfPoint([pxFromx, pxFromy]);
-    const [gridTox, gridToy] = grid_getxyOfPoint([pxTox, pxToy]);
-    return [gridTox - gridFromx, gridToy - gridFromy];
-  }
-
-  function setGridParams({width, cols, rowHeight, gap}) {
-    if (typeof width === 'number') {
-      _width = width;
-    }
-    if (typeof cols === 'number') {
-      _cols = cols;
-    }
-    if (typeof rowHeight === 'number') {
-      _rowHeight = rowHeight;
-    }
-    if (typeof gap === 'number') {
-      _gap = gap;
+    if (thisPanePreviewing) {
+      thisPanePreviewing.decreaseZIndexLevel();
+      thisPanePreviewing.decreaseZIndexLevel();
+      thisPanePreviewing = null;
     }
   }
 
-  function addPane(newPane) {
-    const paneId = genid();
-    _paneIds.push(paneId);
-    _paneInstances[paneId] = newPane;
-    newPane.belongsToGrid(gridInstance, paneId);
-    return paneId;
-  }
-
-  function removePane(paneId) {
-    const paneIdIndex = _paneIds.findIndex((id) => id === paneId);
-    _paneIds.splice(paneIdIndex, 1);
-    _paneInstances[paneId].belongsToGrid(null, null);
-    delete _paneInstances[paneId];
-  }
-
-  function hasCollision() {
+  function isHavingAnyCollision() {
     let panesToConsider = [];
-    if (_paneInPreview) {
+    if (thisPanePreviewing) {
       panesToConsider = (
-        _paneIds
-          .filter((pId) => (pId !== _paneInPreview.getId()))
-          .map((pId) => getPane(pId))
+        thisPaneIds
+          .filter((paneId) => (paneId !== thisPanePreviewing.getId()))
+          .map((paneId) => getPane(paneId))
       ).concat(
         [getPreviewPane()]
       );
     } else {
-      panesToConsider = _paneIds.map((pId) => getPane(pId));
+      panesToConsider = thisPaneIds.map((paneId) => getPane(paneId));
     }
     for (let i = 0; i < panesToConsider.length - 1; i += 1) {
       for (let j = i + 1; j < panesToConsider.length; j += 1) {
@@ -154,14 +158,14 @@ function flexiGrid({width, cols, rowHeight, gap}) {
     return false;
   }
 
-  function hasPreviewCollision() {
+  function isHavingCollisionWithPreviewPane() {
     const previewPane = getPreviewPane();
     let panesToConsider = [];
-    if (_paneInPreview) {
+    if (thisPanePreviewing) {
       panesToConsider = (
-        _paneIds
-          .filter((pId) => (pId !== _paneInPreview.getId()))
-          .map((pId) => getPane(pId))
+        thisPaneIds
+          .filter((paneId) => (paneId !== thisPanePreviewing.getId()))
+          .map((paneId) => getPane(paneId))
       );
       for (let i = 0; i < panesToConsider.length; i += 1) {
         if (isTwoPanesCollided(previewPane, panesToConsider[i])) {
@@ -173,24 +177,24 @@ function flexiGrid({width, cols, rowHeight, gap}) {
   }
 
   const gridInstance = {
-    getGridParams,
+    calculateVectorByPixelOfPixels,
+    calculateVectorByGridCellOfPixels,
+    getGridData,
     getPaneIds,
     getPane,
     getPreviewPane,
+    getCellSizeByPixel,
+    getGridHeightByPixel,
+    getXYByGridCellOfPixel,
+    getGridHeightByGridCell,
     setPreviewPane,
     attachPreview,
     detachPreview,
-    px_getCellSize,
-    px_getGridHeight,
-    px_calVector,
-    grid_getxyOfPoint,
-    grid_getGridHeight,
-    grid_calVector,
-    setGridParams,
+    setGridParameter,
     addPane,
     removePane,
-    hasCollision,
-    hasPreviewCollision,
+    isHavingAnyCollision,
+    isHavingCollisionWithPreviewPane,
   };
 
   return gridInstance;

@@ -1,212 +1,213 @@
 const {zeroOrientedFloor} = require('../utils/floor.js');
 
-function flexiPane({onGridx, onGridy, onGridWidth, onGridHeight}) {
-  let _onGridx = _validGridx(typeof onGridx === 'number' ? onGridx : 0);
-  let _onGridy = _validGridy(typeof onGridy === 'number' ? onGridy : 0);
-  let _onGridWidth = _validGridWidth(typeof onGridWidth === 'number' ? onGridWidth : 2);
-  let _onGridHeight = _validGridHeight(typeof onGridHeight === 'number' ? onGridHeight : 2);
-  let _zIndexLevel = 0;
-  let _gridInstance = null;
-  let _ownId = null;
+function flexiPane({xByGridCell, yByGridCell, widthByGridCell, heightByGridCell}) {
+  let thisXByGridCell = makeValidXByGridCell(typeof xByGridCell === 'number' ? xByGridCell : 0);
+  let thisYByGridCell = makeValidYByGridCell(typeof yByGridCell === 'number' ? yByGridCell : 0);
+  let thisWidthByGridCell = makeValidWidthByGridCell(typeof widthByGridCell === 'number' ? widthByGridCell : 2);
+  let thisHeightByGridCell = makeValidHeightByGridCell(typeof heightByGridCell === 'number' ? heightByGridCell : 2);
+  let thisZIndexLevel = 0;
+  let thisGridInstance = null;
+  let thisOwnId = null;
 
-  function _validGridx(gridx) {
-    if (gridx < 0) {
+  function makeValidXByGridCell(xByGridCell) {
+    if (xByGridCell < 0) {
       return 0;
     }    
-    return gridx;
+    return xByGridCell;
   }
 
-  function _validGridy(gridy) {
-    if (gridy < 0) {
+  function makeValidYByGridCell(yByGridCell) {
+    if (yByGridCell < 0) {
       return 0;
     }    
-    return gridy;
+    return yByGridCell;
   }
 
-  function _validGridWidth(gridWidth) {
-    return (gridWidth < 1) ? 1 : gridWidth;
+  function makeValidWidthByGridCell(widthByGridCell) {
+    return (widthByGridCell < 1) ? 1 : widthByGridCell;
   }
 
-  function _validGridHeight(gridHeight) {
-    return (gridHeight < 1) ? 1 : gridHeight;
+  function makeValidHeightByGridCell(heightByGridCell) {
+    return (heightByGridCell < 1) ? 1 : heightByGridCell;
   }
 
   function getId() {
-    return _ownId;
+    return thisOwnId;
   }
 
   function getZIndexLevel() {
-    return _zIndexLevel;
+    return thisZIndexLevel;
   }
 
+  function getXYByPixel() {
+    const cellSizeByPixel = thisGridInstance.getCellSizeByPixel();
+    const gridData = thisGridInstance.getGridData();
+    const xByPixel = thisXByGridCell * (cellSizeByPixel[0] + gridData.gapByPixel);
+    const yByPixel = thisYByGridCell * (cellSizeByPixel[1] + gridData.gapByPixel);
+    return [xByPixel, yByPixel];
+  }
+
+  function getWidthHeightByPixel() {
+    const cellSize = thisGridInstance.getCellSizeByPixel();
+    const gridData = thisGridInstance.getGridData();
+    const widthByPixel = thisWidthByGridCell * cellSize[0] + (thisWidthByGridCell - 1) * gridData.gapByPixel;
+    const heightByPixel = thisHeightByGridCell * cellSize[1] + (thisHeightByGridCell - 1) * gridData.gapByPixel;
+    return [widthByPixel, heightByPixel];
+  }
+
+  function getBottomRightXYByPixel() {
+    const cellSizeByPixel = thisGridInstance.getCellSizeByPixel();
+    const gridData = thisGridInstance.getGridData();
+    const topLeftXByPixel = thisXByGridCell * (cellSizeByPixel[0] + gridData.gapByPixel);
+    const topLeftYByPixel = thisYByGridCell * (cellSizeByPixel[1] + gridData.gapByPixel);
+    const widthByPixel = thisWidthByGridCell * cellSizeByPixel[0] + (thisWidthByGridCell - 1) * gridData.gapByPixel;
+    const heightByPixel = thisHeightByGridCell * cellSizeByPixel[1] + (thisHeightByGridCell - 1) * gridData.gapByPixel;
+    return [topLeftXByPixel + widthByPixel, topLeftYByPixel + heightByPixel];
+  }
+
+  function getXYByGridCell() {
+    return [thisXByGridCell, thisYByGridCell];
+  }
+
+  function getWidthHeightByGridCell() {
+    return [thisWidthByGridCell, thisHeightByGridCell];
+  }
+
+
   function belongsToGrid(gridInstance, ownId) {
-    _gridInstance = gridInstance;
-    _ownId = ownId;
+    thisGridInstance = gridInstance;
+    thisOwnId = ownId;
   }
 
   function fitToSlot() {
-    _onGridx = _validGridx(Math.round(_onGridx));
-    _onGridy = _validGridy(Math.round(_onGridy));
-    _onGridWidth = _validGridWidth(Math.round(_onGridWidth));
-    _onGridHeight = _validGridHeight(Math.round(_onGridHeight));
+    thisXByGridCell = makeValidXByGridCell(Math.round(thisXByGridCell));
+    thisYByGridCell = makeValidYByGridCell(Math.round(thisYByGridCell));
+    thisWidthByGridCell = makeValidWidthByGridCell(Math.round(thisWidthByGridCell));
+    thisHeightByGridCell = makeValidHeightByGridCell(Math.round(thisHeightByGridCell));
   }
 
   function increaseZIndexLevel() {
-    _zIndexLevel += 1;
+    thisZIndexLevel += 1;
   }
 
   function decreaseZIndexLevel() {
-    if (_zIndexLevel > 0) {
-      _zIndexLevel -= 1;
+    if (thisZIndexLevel > 0) {
+      thisZIndexLevel -= 1;
     }
   }
 
-  function px_getxy() {
-    const cellSize = _gridInstance.px_getCellSize();
-    const gridParams = _gridInstance.getGridParams();
-    const x = _onGridx * (cellSize[0] + gridParams.gap);
-    const y = _onGridy * (cellSize[1] + gridParams.gap);
-    return [x, y];
-  }
-
-  function px_getWidthHeight() {
-    const cellSize = _gridInstance.px_getCellSize();
-    const gridParams = _gridInstance.getGridParams();
-    const width = _onGridWidth * cellSize[0] + (_onGridWidth - 1) * gridParams.gap;
-    const height = _onGridHeight * cellSize[1] + (_onGridHeight - 1) * gridParams.gap;
-    return [width, height];
-  }
-
-  function px_getBottomRightxy() {
-    const cellSize = _gridInstance.px_getCellSize();
-    const gridParams = _gridInstance.getGridParams();
-    const topLeftx = _onGridx * (cellSize[0] + gridParams.gap);
-    const topLefty = _onGridy * (cellSize[1] + gridParams.gap);
-    const width = _onGridWidth * cellSize[0] + (_onGridWidth - 1) * gridParams.gap;
-    const height = _onGridHeight * cellSize[1] + (_onGridHeight - 1) * gridParams.gap;
-    return [topLeftx + width, topLefty + height];
-  }
-
-  function px_setxy([pxx, pxy]) {
-    if (typeof pxx === 'number' && typeof pxy === 'number') {
-      const cellSize = _gridInstance.px_getCellSize();
-      const gridParams = _gridInstance.getGridParams();
-      _onGridx = _validGridx(pxx / (cellSize[0] + gridParams.gap));
-      _onGridy = _validGridy(pxy / (cellSize[1] + gridParams.gap));
+  function setXYByPixel([xByPixel, yByPixel]) {
+    if (typeof xByPixel === 'number' && typeof yByPixel === 'number') {
+      const cellSizeByPixel = thisGridInstance.getCellSizeByPixel();
+      const gridData = thisGridInstance.getGridData();
+      thisXByGridCell = makeValidXByGridCell(xByPixel / (cellSizeByPixel[0] + gridData.gapByPixel));
+      thisYByGridCell = makeValidYByGridCell(yByPixel / (cellSizeByPixel[1] + gridData.gapByPixel));
     } else {
-      console.error('Pane.px_setxy: x, y must be numbers');
+      console.error('Pane.setXYByPixel: x, y must be numbers');
     }
   }
 
-  function px_setWidthHeight([pxWidth, pxHeight]) {
-    if (typeof pxWidth === 'number' && typeof pxHeight === 'number') {
-      const cellSize = _gridInstance.px_getCellSize();
-      const gridParams = _gridInstance.getGridParams();
-      _onGridWidth = _validGridWidth((pxWidth + gridParams.gap) / (cellSize[0] + gridParams.gap));
-      _onGridHeight = _validGridHeight((pxHeight + gridParams.gap) / (cellSize[1] + gridParams.gap));
+  function setWidthHeightByPixel([widthByPixel, heightByPixel]) {
+    if (typeof widthByPixel === 'number' && typeof heightByPixel === 'number') {
+      const cellSizeByPixel = thisGridInstance.getCellSizeByPixel();
+      const gridData = thisGridInstance.getGridData();
+      thisWidthByGridCell = makeValidWidthByGridCell((widthByPixel + gridData.gapByPixel) / (cellSizeByPixel[0] + gridData.gapByPixel));
+      thisHeightByGridCell = makeValidHeightByGridCell((heightByPixel + gridData.gapByPixel) / (cellSizeByPixel[1] + gridData.gapByPixel));
     } else {
-      console.error('Pane.px_setWidthHeight: width, height must be numbers');
+      console.error('Pane.setWidthHeightByPixel: width, height must be numbers');
     }
   }
 
-  function px_positioning([pxPickPointx, pxPickPointy], [pxOffsetToTopLeftx, pxOffsetToTopLefty]) {
-    px_setxy([
-      pxPickPointx + pxOffsetToTopLeftx,
-      pxPickPointy + pxOffsetToTopLefty,
+  function setXYByGridCell([xByGridCell, yByGridCell]) {
+    if (typeof xByGridCell === 'number' && typeof yByGridCell === 'number') {
+      thisXByGridCell = makeValidXByGridCell(xByGridCell);
+      thisYByGridCell = makeValidYByGridCell(yByGridCell);
+    } else {
+      console.error('Pane.setXYByGridCell: x, y must be numbers');
+    }
+  }
+
+  function setWidthHeightByGridCell([widthByGridCell, heightByGridCell]) {
+    if (typeof widthByGridCell === 'number' && typeof heightByGridCell === 'number') {
+      thisWidthByGridCell = makeValidWidthByGridCell(widthByGridCell);
+      thisHeightByGridCell = makeValidHeightByGridCell(heightByGridCell);
+    } else {
+      console.error('Pane.setWidthHeightByGridCell: width, height must be numbers');
+    }
+  }
+
+  function positioningByPixelWithPixels([pickPointXByPixel, pickPointYByPixel], [offsetToTopLeftXByPixel, offsetToTopLeftYByPixel]) {
+    setXYByPixel([
+      pickPointXByPixel + offsetToTopLeftXByPixel,
+      pickPointYByPixel + offsetToTopLeftYByPixel,
     ]);
   }
 
-  function px_sizing([pxPickPointx, pxPickPointy], [pxOffsetToBottomRightx, pxOffsetToBottomRighty]) {
-    const [pxTopLeftx, pxTopLefty] = px_getxy();
-    const [pxBottomRightx, pxBottomRighty] = [
-      pxPickPointx + pxOffsetToBottomRightx,
-      pxPickPointy + pxOffsetToBottomRighty,
+  function sizingByPixelWithPixels([pickPointXByPixel, pickPointYByPixel], [offsetToBottomRightXByPixel, offsetToBottomRightYByPixel]) {
+    const [topLeftXByPixel, topLeftYByPixel] = getXYByPixel();
+    const [bottomRightXByPixel, bottomRightYByPixel] = [
+      pickPointXByPixel + offsetToBottomRightXByPixel,
+      pickPointYByPixel + offsetToBottomRightYByPixel,
     ];
-    px_setWidthHeight([
-      pxBottomRightx - pxTopLeftx + 1,
-      pxBottomRighty - pxTopLefty + 1,
+    setWidthHeightByPixel([
+      bottomRightXByPixel - topLeftXByPixel + 1,
+      bottomRightYByPixel - topLeftYByPixel + 1,
     ]);
   }
 
-  function grid_getxy() {
-    return [_onGridx, _onGridy];
-  }
-
-  function grid_getWidthHeight() {
-    return [_onGridWidth, _onGridHeight];
-  }
-
-  function grid_setxy([onGridx, onGridy]) {
-    if (typeof onGridx === 'number' && typeof onGridy === 'number') {
-      _onGridx = _validGridx(onGridx);
-      _onGridy = _validGridy(onGridy);
-    } else {
-      console.error('Pane.grid_setxy: x, y must be numbers');
-    }
-  }
-
-  function grid_setWidthHeight([gridWidth, gridHeight]) {
-    if (typeof gridWidth === 'number' && typeof gridHeight === 'number') {
-      _onGridWidth = _validGridWidth(gridWidth);
-      _onGridHeight = _validGridHeight(gridHeight);
-    } else {
-      console.error('Pane.grid_setWidthHeight: width, height must be numbers');
-    }
-  }
-
-  function grid_positioning([pxPickPointx, pxPickPointy], [pxOffsetToTopLeftx, pxOffsetToTopLefty]) {
-    const cellSize = _gridInstance.px_getCellSize();
-    const gridParams = _gridInstance.getGridParams();
-    const [gridPickPointx, gridPickPointy] = _gridInstance.grid_getxyOfPoint([pxPickPointx, pxPickPointy]);
-    const [gridOffsetToTopLeftx, gridOffsetToTopLefty] = [
-      zeroOrientedFloor(pxOffsetToTopLeftx / (cellSize[0] + gridParams.gap)),
-      zeroOrientedFloor(pxOffsetToTopLefty / (cellSize[1] + gridParams.gap)),
+  function positioningByGridCellWithPixels([pickPointXByPixel, pickPointYByPixel], [offsetToTopLeftXByPixel, offsetToTopLeftYByPixel]) {
+    const cellSizeByPixel = thisGridInstance.getCellSizeByPixel();
+    const gridData = thisGridInstance.getGridData();
+    const [pickPointXByGridCell, pickPointYByGridCell] = thisGridInstance.getXYByGridCellOfPixel([pickPointXByPixel, pickPointYByPixel]);
+    const [offsetToTopLeftXByGridCell, offsetToTopLeftYByGridCell] = [
+      zeroOrientedFloor(offsetToTopLeftXByPixel / (cellSizeByPixel[0] + gridData.gapByPixel)),
+      zeroOrientedFloor(offsetToTopLeftYByPixel / (cellSizeByPixel[1] + gridData.gapByPixel)),
     ];
-    grid_setxy([
-      gridPickPointx + gridOffsetToTopLeftx,
-      gridPickPointy + gridOffsetToTopLefty,
+    setXYByGridCell([
+      pickPointXByGridCell + offsetToTopLeftXByGridCell,
+      pickPointYByGridCell + offsetToTopLeftYByGridCell,
     ]);
   }
 
-  function grid_sizing([pxPickPointx, pxPickPointy], [pxOffsetToBottomRightx, pxOffsetToBottomRighty]) {
-    const cellSize = _gridInstance.px_getCellSize();
-    const gridParams = _gridInstance.getGridParams();
-    const [gridPickPointx, gridPickPointy] = _gridInstance.grid_getxyOfPoint([pxPickPointx, pxPickPointy]);
-    const [gridOffsetToBottomRightx, gridOffsetToBottomRighty] = [
-      zeroOrientedFloor(pxOffsetToBottomRightx / (cellSize[0] + gridParams.gap)),
-      zeroOrientedFloor(pxOffsetToBottomRighty / (cellSize[1] + gridParams.gap)),
+  function sizingByGridCellWithPixels([pickPointXByPixel, pickPointYByPixel], [offsetToBottomRightXByPixel, offsetToBottomRightYByPixel]) {
+    const cellSizeByPixel = thisGridInstance.getCellSizeByPixel();
+    const gridData = thisGridInstance.getGridData();
+    const [pickPointXByGridCell, pickPointYByGridCell] = thisGridInstance.getXYByGridCellOfPixel([pickPointXByPixel, pickPointYByPixel]);
+    const [offsetToBottomRightXByGridCell, offsetToBottomRightYByGridCell] = [
+      zeroOrientedFloor(offsetToBottomRightXByPixel / (cellSizeByPixel[0] + gridData.gapByPixel)),
+      zeroOrientedFloor(offsetToBottomRightYByPixel / (cellSizeByPixel[1] + gridData.gapByPixel)),
     ];
-    const [gridTopLeftx, gridTopLefty] = grid_getxy();
-    const [gridBottomRightx, gridBottomRighty] = [
-      gridPickPointx + gridOffsetToBottomRightx,
-      gridPickPointy + gridOffsetToBottomRighty,
+    const [topLeftXByGridCell, topLeftYByGridCell] = getXYByGridCell();
+    const [bottomRightXByGridCell, bottomRightYByGridCell] = [
+      pickPointXByGridCell + offsetToBottomRightXByGridCell,
+      pickPointYByGridCell + offsetToBottomRightYByGridCell,
     ];
-    grid_setWidthHeight([
-      gridBottomRightx - gridTopLeftx + 1,
-      gridBottomRighty - gridTopLefty + 1,
+    setWidthHeightByGridCell([
+      bottomRightXByGridCell - topLeftXByGridCell + 1,
+      bottomRightYByGridCell - topLeftYByGridCell + 1,
     ]);
   }
 
   return {
     getId,
     getZIndexLevel,
+    getXYByPixel,
+    getWidthHeightByPixel,
+    getBottomRightXYByPixel,
+    getXYByGridCell,
+    getWidthHeightByGridCell,
     belongsToGrid,
     fitToSlot,
     increaseZIndexLevel,
     decreaseZIndexLevel,
-    px_getxy,
-    px_getWidthHeight,
-    px_getBottomRightxy,
-    px_setxy,
-    px_setWidthHeight,
-    px_positioning,
-    px_sizing,
-    grid_getxy,
-    grid_getWidthHeight,
-    grid_setxy,
-    grid_setWidthHeight,
-    grid_positioning,
-    grid_sizing,
+    setXYByPixel,
+    setWidthHeightByPixel,
+    setXYByGridCell,
+    setWidthHeightByGridCell,
+    positioningByPixelWithPixels,
+    sizingByPixelWithPixels,
+    positioningByGridCellWithPixels,
+    sizingByGridCellWithPixels,
   };
 };
 
