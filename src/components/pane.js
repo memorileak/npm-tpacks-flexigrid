@@ -73,6 +73,17 @@ function flexiPane({xByGridCell, yByGridCell, widthByGridCell, heightByGridCell}
     return [thisWidthByGridCell, thisHeightByGridCell];
   }
 
+  function getCurrentState() {
+    return {
+      id: thisOwnId,
+      xByGridCell: thisXByGridCell,
+      yByGridCell: thisYByGridCell,
+      widthByGridCell: thisWidthByGridCell,
+      heightByGridCell: thisHeightByGridCell,
+      zIndexLevel: thisZIndexLevel,
+    };
+  }
+
 
   function belongsToGrid(gridInstance, ownId) {
     thisGridInstance = gridInstance;
@@ -103,7 +114,7 @@ function flexiPane({xByGridCell, yByGridCell, widthByGridCell, heightByGridCell}
       thisXByGridCell = makeValidXByGridCell(xByPixel / (cellSizeByPixel[0] + gridData.gapByPixel));
       thisYByGridCell = makeValidYByGridCell(yByPixel / (cellSizeByPixel[1] + gridData.gapByPixel));
     } else {
-      console.error('Pane.setXYByPixel: x, y must be numbers');
+      throw new Error('Pane.setXYByPixel: x, y must be numbers');
     }
   }
 
@@ -114,7 +125,7 @@ function flexiPane({xByGridCell, yByGridCell, widthByGridCell, heightByGridCell}
       thisWidthByGridCell = makeValidWidthByGridCell((widthByPixel + gridData.gapByPixel) / (cellSizeByPixel[0] + gridData.gapByPixel));
       thisHeightByGridCell = makeValidHeightByGridCell((heightByPixel + gridData.gapByPixel) / (cellSizeByPixel[1] + gridData.gapByPixel));
     } else {
-      console.error('Pane.setWidthHeightByPixel: width, height must be numbers');
+      throw new Error('Pane.setWidthHeightByPixel: width, height must be numbers');
     }
   }
 
@@ -123,7 +134,7 @@ function flexiPane({xByGridCell, yByGridCell, widthByGridCell, heightByGridCell}
       thisXByGridCell = makeValidXByGridCell(xByGridCell);
       thisYByGridCell = makeValidYByGridCell(yByGridCell);
     } else {
-      console.error('Pane.setXYByGridCell: x, y must be numbers');
+      throw new Error('Pane.setXYByGridCell: x, y must be numbers');
     }
   }
 
@@ -132,7 +143,7 @@ function flexiPane({xByGridCell, yByGridCell, widthByGridCell, heightByGridCell}
       thisWidthByGridCell = makeValidWidthByGridCell(widthByGridCell);
       thisHeightByGridCell = makeValidHeightByGridCell(heightByGridCell);
     } else {
-      console.error('Pane.setWidthHeightByGridCell: width, height must be numbers');
+      throw new Error('Pane.setWidthHeightByGridCell: width, height must be numbers');
     }
   }
 
@@ -196,6 +207,7 @@ function flexiPane({xByGridCell, yByGridCell, widthByGridCell, heightByGridCell}
     getBottomRightXYByPixel,
     getXYByGridCell,
     getWidthHeightByGridCell,
+    getCurrentState,
 
     belongsToGrid,
     fitToSlot,

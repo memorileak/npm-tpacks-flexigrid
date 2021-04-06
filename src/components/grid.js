@@ -81,6 +81,20 @@ function flexiGrid({widthByPixel, numberOfColumns, rowHeightByPixel, gapByPixel}
     return [xByGridCell, yByGridCell];
   }
 
+  function getCurrentState() {
+    return {
+      widthByPixel: thisWidthByPixel,
+      numberOfColumns: thisNumberOfColumns,
+      rowHeightByPixel: thisRowHeightByPixel,
+      gapByPixel: thisGapByPixel,
+      previewPane: thisPreviewPane,
+      panePreviewing: thisPanePreviewing,
+      paneIds: thisPaneIds,
+      paneInstances: thisPaneInstances,
+    };
+  }
+
+
   function setGridParameter({widthByPixel, numberOfColumns, rowHeightByPixel, gapByPixel}) {
     if (typeof widthByPixel === 'number') {
       thisWidthByPixel = widthByPixel;
@@ -96,12 +110,23 @@ function flexiGrid({widthByPixel, numberOfColumns, rowHeightByPixel, gapByPixel}
     }
   }
 
-  function addPane(newPane) {
+  function addPaneWithRandomId(newPane) {
     const paneId = genid();
     thisPaneIds.push(paneId);
     thisPaneInstances[paneId] = newPane;
     newPane.belongsToGrid(gridInstance, paneId);
     return paneId;
+  }
+
+  function addPaneWithSpecificId(newPane, paneId) {
+    if (paneId) {
+      thisPaneIds.push(paneId);
+      thisPaneInstances[paneId] = newPane;
+      newPane.belongsToGrid(gridInstance, paneId);
+      return paneId;
+    } else {
+      throw new Error('Grid.addPaneWithSpecificId: paneId must not be empty');
+    }
   }
 
   function removePane(paneId) {
@@ -111,17 +136,27 @@ function flexiGrid({widthByPixel, numberOfColumns, rowHeightByPixel, gapByPixel}
     delete thisPaneInstances[paneId];
   }
 
-  function setPreviewPane(previewPane) {
+  function setPreviewPaneWithRandomId(previewPane) {
     const previewPaneId = genid();
-    previewPane.increaseZIndexLevel();
     thisPreviewPane = previewPane;
     previewPane.belongsToGrid(gridInstance, previewPaneId);
     return previewPaneId;
   }
 
+  function setPreviewPaneWithSpecificId(previewPane, previewPaneId) {
+    if (previewPaneId) {
+      thisPreviewPane = previewPane;
+      previewPane.belongsToGrid(gridInstance, previewPaneId);
+      return previewPaneId;
+    } else {
+      throw new Error('Grid.setPreviewPaneWithSpecificId: previewPaneId must not be empty');
+    }
+  }
+
   function attachPreview(paneInstance) {
     paneInstance.increaseZIndexLevel();
     paneInstance.increaseZIndexLevel();
+    thisPreviewPane.increaseZIndexLevel();
     thisPanePreviewing = paneInstance;
     thisPreviewPane.setXYByGridCell(paneInstance.getXYByGridCell());
     thisPreviewPane.setWidthHeightByGridCell(paneInstance.getWidthHeightByGridCell());
@@ -131,6 +166,7 @@ function flexiGrid({widthByPixel, numberOfColumns, rowHeightByPixel, gapByPixel}
     if (thisPanePreviewing) {
       thisPanePreviewing.decreaseZIndexLevel();
       thisPanePreviewing.decreaseZIndexLevel();
+      thisPreviewPane.decreaseZIndexLevel();
       thisPanePreviewing = null;
     }
   }
@@ -186,14 +222,17 @@ function flexiGrid({widthByPixel, numberOfColumns, rowHeightByPixel, gapByPixel}
     getPreviewPane,
     getCellSizeByPixel,
     getGridHeightByPixel,
-    getXYByGridCellFromPixel,
     getGridHeightByGridCell,
+    getXYByGridCellFromPixel,
+    getCurrentState,
 
-    setPreviewPane,
+    setPreviewPaneWithRandomId,
+    setPreviewPaneWithSpecificId,
     attachPreview,
     detachPreview,
     setGridParameter,
-    addPane,
+    addPaneWithRandomId,
+    addPaneWithSpecificId,
     removePane,
     isHavingAnyCollision,
     isHavingCollisionWithPreviewPane,
