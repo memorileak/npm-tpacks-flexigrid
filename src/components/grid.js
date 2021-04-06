@@ -23,13 +23,13 @@ function flexiGrid({widthByPixel, numberOfColumns, rowHeightByPixel, gapByPixel}
     );
   }
 
-  function calculateVectorByPixelOfPixels([sourceXByPixel, sourceYByPixel], [destXByPixel, destYByPixel]) {
+  function calculateVectorByPixelFromPixels([sourceXByPixel, sourceYByPixel], [destXByPixel, destYByPixel]) {
     return [destXByPixel - sourceXByPixel, destYByPixel - sourceYByPixel];
   }
 
-  function calculateVectorByGridCellOfPixels([sourceXByPixel, sourceYByPixel], [destXByPixel, destYByPixel]) {
-    const [sourceXByGridCell, sourceYByGridCell] = getXYByGridCellOfPixel([sourceXByPixel, sourceYByPixel]);
-    const [destXByGridCell, destYByGridCell] = getXYByGridCellOfPixel([destXByPixel, destYByPixel]);
+  function calculateVectorByGridCellFromPixels([sourceXByPixel, sourceYByPixel], [destXByPixel, destYByPixel]) {
+    const [sourceXByGridCell, sourceYByGridCell] = getXYByGridCellFromPixel([sourceXByPixel, sourceYByPixel]);
+    const [destXByGridCell, destYByGridCell] = getXYByGridCellFromPixel([destXByPixel, destYByPixel]);
     return [destXByGridCell - sourceXByGridCell, destYByGridCell - sourceYByGridCell];
   }
 
@@ -70,11 +70,11 @@ function flexiGrid({widthByPixel, numberOfColumns, rowHeightByPixel, gapByPixel}
   }
 
   function getGridHeightByGridCell() {
-    const [, maxYByGridCell] = getXYByGridCellOfPixel([0, getGridHeightByPixel()]);
+    const [, maxYByGridCell] = getXYByGridCellFromPixel([0, getGridHeightByPixel()]);
     return maxYByGridCell + 1;
   }
 
-  function getXYByGridCellOfPixel([xByPixel, yByPixel]) {
+  function getXYByGridCellFromPixel([xByPixel, yByPixel]) {
     const cellSizeByPixel = getCellSizeByPixel();
     const xByGridCell = Math.floor(xByPixel / (cellSizeByPixel[0] + thisGapByPixel));
     const yByGridCell = Math.floor(yByPixel / (cellSizeByPixel[1] + thisGapByPixel));
@@ -177,8 +177,8 @@ function flexiGrid({widthByPixel, numberOfColumns, rowHeightByPixel, gapByPixel}
   }
 
   const gridInstance = {
-    calculateVectorByPixelOfPixels,
-    calculateVectorByGridCellOfPixels,
+    calculateVectorByPixelFromPixels,
+    calculateVectorByGridCellFromPixels,
 
     getGridData,
     getPaneIds,
@@ -186,7 +186,7 @@ function flexiGrid({widthByPixel, numberOfColumns, rowHeightByPixel, gapByPixel}
     getPreviewPane,
     getCellSizeByPixel,
     getGridHeightByPixel,
-    getXYByGridCellOfPixel,
+    getXYByGridCellFromPixel,
     getGridHeightByGridCell,
 
     setPreviewPane,

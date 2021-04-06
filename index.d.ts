@@ -52,11 +52,11 @@ export interface FlexiGridData {
 }
 
 export interface FlexiGrid {
-  calculateVectorByPixelOfPixels(
+  calculateVectorByPixelFromPixels(
     [sourceXByPixel, sourceYByPixel]: [number, number], 
     [destXByPixel, destYByPixel]: [number, number],
   ): [number, number],
-  calculateVectorByGridCellOfPixels(
+  calculateVectorByGridCellFromPixels(
     [sourceXByPixel, sourceYByPixel]: [number, number], 
     [destXByPixel, destYByPixel]: [number, number],
   ): [number, number],
@@ -67,7 +67,7 @@ export interface FlexiGrid {
   getPreviewPane(): FlexiPane,
   getCellSizeByPixel(): [number, number],
   getGridHeightByPixel(): number,
-  getXYByGridCellOfPixel([xByPixel, yByPixel]: [number, number]): [number, number],
+  getXYByGridCellFromPixel([xByPixel, yByPixel]: [number, number]): [number, number],
   getGridHeightByGridCell(): number,
 
   setPreviewPane(previewPane: FlexiPane): string,

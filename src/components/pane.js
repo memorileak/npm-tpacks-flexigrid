@@ -158,7 +158,7 @@ function flexiPane({xByGridCell, yByGridCell, widthByGridCell, heightByGridCell}
   function positioningByGridCellWithPixels([pickPointXByPixel, pickPointYByPixel], [offsetToTopLeftXByPixel, offsetToTopLeftYByPixel]) {
     const cellSizeByPixel = thisGridInstance.getCellSizeByPixel();
     const gridData = thisGridInstance.getGridData();
-    const [pickPointXByGridCell, pickPointYByGridCell] = thisGridInstance.getXYByGridCellOfPixel([pickPointXByPixel, pickPointYByPixel]);
+    const [pickPointXByGridCell, pickPointYByGridCell] = thisGridInstance.getXYByGridCellFromPixel([pickPointXByPixel, pickPointYByPixel]);
     const [offsetToTopLeftXByGridCell, offsetToTopLeftYByGridCell] = [
       zeroOrientedFloor(offsetToTopLeftXByPixel / (cellSizeByPixel[0] + gridData.gapByPixel)),
       zeroOrientedFloor(offsetToTopLeftYByPixel / (cellSizeByPixel[1] + gridData.gapByPixel)),
@@ -172,7 +172,7 @@ function flexiPane({xByGridCell, yByGridCell, widthByGridCell, heightByGridCell}
   function sizingByGridCellWithPixels([pickPointXByPixel, pickPointYByPixel], [offsetToBottomRightXByPixel, offsetToBottomRightYByPixel]) {
     const cellSizeByPixel = thisGridInstance.getCellSizeByPixel();
     const gridData = thisGridInstance.getGridData();
-    const [pickPointXByGridCell, pickPointYByGridCell] = thisGridInstance.getXYByGridCellOfPixel([pickPointXByPixel, pickPointYByPixel]);
+    const [pickPointXByGridCell, pickPointYByGridCell] = thisGridInstance.getXYByGridCellFromPixel([pickPointXByPixel, pickPointYByPixel]);
     const [offsetToBottomRightXByGridCell, offsetToBottomRightYByGridCell] = [
       zeroOrientedFloor(offsetToBottomRightXByPixel / (cellSizeByPixel[0] + gridData.gapByPixel)),
       zeroOrientedFloor(offsetToBottomRightYByPixel / (cellSizeByPixel[1] + gridData.gapByPixel)),
