@@ -1,4 +1,4 @@
-function dumpGridState(grid) {
+function makeDumpDataFromGrid(grid) {
   const gridState = grid.getCurrentState();
   return {
     widthByPixel: gridState.widthByPixel,
@@ -36,4 +36,4 @@ function getPanePreviewingId(panePreviewing) {
   return null;
 }
 
-module.exports = {dumpGridState};
+module.exports = {makeDumpDataFromGrid};

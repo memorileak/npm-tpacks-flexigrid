@@ -103,3 +103,27 @@ export interface FlexiGrid {
 
 export type FlexiGridFactory = ({widthByPixel, numberOfColumns, rowHeightByPixel, gapByPixel}: FlexiGridData) => FlexiGrid;
 export const flexiGrid: FlexiGridFactory;
+
+export interface PaneDumpData {
+  id: string,
+  xByGridCell: number,
+  yByGridCell: number,
+  widthByGridCell: number,
+  heightByGridCell: number,
+}
+
+export interface GridDumpData {
+  widthByPixel: number,
+  numberOfColumns: number,
+  rowHeightByPixel: number,
+  gapByPixel: number,
+  previewPane: PaneDumpData,
+  panePreviewingId: string,
+  paneInstances: Record<string, PaneDumpData>,
+}
+
+export type FlexiGridDumper = (gridInstance: FlexiGrid) => GridDumpData;
+export const makeDumpDataFromGrid: FlexiGridDumper;
+export type FlexiGridLoader = (gridDumpData: GridDumpData) => FlexiGrid;
+export const restoreGridFromDumpData: FlexiGridLoader;
+
