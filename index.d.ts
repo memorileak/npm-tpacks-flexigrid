@@ -7,6 +7,7 @@ export interface FlexiPaneData {
 
 export interface FlexiPaneState extends FlexiPaneData {
   id: string, 
+  show: boolean,
   zIndexLevel: number,
 }
 
@@ -18,6 +19,7 @@ export interface FlexiPane {
   getBottomRightXYByPixel(): [number, number],
   getXYByGridCell(): [number, number],
   getWidthHeightByGridCell(): [number, number],
+  isShow(): boolean,
   getCurrentState(): FlexiPaneState,
 
   belongsToGrid(gridInstance: FlexiGrid, ownId: string): void,
@@ -44,6 +46,8 @@ export interface FlexiPane {
     [pickPointXByPixel, pickPointYByPixel]: [number, number], 
     [offsetToBottomRightXByPixel, offsetToBottomRightYByPixel]: [number, number],
   ): void,
+  show(): void,
+  hide(): void,
 }
 
 export type FlexiPaneFactory = ({xByGridCell, yByGridCell, widthByGridCell, heightByGridCell}: FlexiPaneData) => FlexiPane;
@@ -106,6 +110,7 @@ export const flexiGrid: FlexiGridFactory;
 
 export interface PaneDumpData {
   id: string,
+  show: boolean,
   xByGridCell: number,
   yByGridCell: number,
   widthByGridCell: number,

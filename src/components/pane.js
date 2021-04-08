@@ -8,6 +8,7 @@ function flexiPane({xByGridCell, yByGridCell, widthByGridCell, heightByGridCell}
   let thisZIndexLevel = 0;
   let thisGridInstance = null;
   let thisOwnId = null;
+  let thisIsShow = true;
 
   function makeValidXByGridCell(xByGridCell) {
     if (xByGridCell < 0) {
@@ -73,9 +74,14 @@ function flexiPane({xByGridCell, yByGridCell, widthByGridCell, heightByGridCell}
     return [thisWidthByGridCell, thisHeightByGridCell];
   }
 
+  function isShow() {
+    return thisIsShow;
+  }
+
   function getCurrentState() {
     return {
       id: thisOwnId,
+      show: thisIsShow,
       xByGridCell: thisXByGridCell,
       yByGridCell: thisYByGridCell,
       widthByGridCell: thisWidthByGridCell,
@@ -199,6 +205,14 @@ function flexiPane({xByGridCell, yByGridCell, widthByGridCell, heightByGridCell}
     ]);
   }
 
+  function show() {
+    thisIsShow = true;
+  }
+
+  function hide() {
+    thisIsShow = false;
+  }
+
   return {
     getId,
     getZIndexLevel,
@@ -207,6 +221,7 @@ function flexiPane({xByGridCell, yByGridCell, widthByGridCell, heightByGridCell}
     getBottomRightXYByPixel,
     getXYByGridCell,
     getWidthHeightByGridCell,
+    isShow,
     getCurrentState,
 
     belongsToGrid,
@@ -221,6 +236,8 @@ function flexiPane({xByGridCell, yByGridCell, widthByGridCell, heightByGridCell}
     sizingByPixelWithPixels,
     positioningByGridCellWithPixels,
     sizingByGridCellWithPixels,
+    show,
+    hide,
   };
 };
 

@@ -178,11 +178,14 @@ function flexiGrid({widthByPixel, numberOfColumns, rowHeightByPixel, gapByPixel}
         thisPaneIds
           .filter((paneId) => (paneId !== thisPanePreviewing.getId()))
           .map((paneId) => getPane(paneId))
-      ).concat(
-        [getPreviewPane()]
-      );
+      )
+        .concat([getPreviewPane()])
+        .filter((pane) => pane.isShow());
+      ;
     } else {
-      panesToConsider = thisPaneIds.map((paneId) => getPane(paneId));
+      panesToConsider = thisPaneIds
+        .map((paneId) => getPane(paneId))
+        .filter((pane) => pane.isShow());
     }
     for (let i = 0; i < panesToConsider.length - 1; i += 1) {
       for (let j = i + 1; j < panesToConsider.length; j += 1) {
@@ -197,12 +200,11 @@ function flexiGrid({widthByPixel, numberOfColumns, rowHeightByPixel, gapByPixel}
   function isHavingCollisionWithPreviewPane() {
     const previewPane = getPreviewPane();
     let panesToConsider = [];
-    if (thisPanePreviewing) {
-      panesToConsider = (
-        thisPaneIds
-          .filter((paneId) => (paneId !== thisPanePreviewing.getId()))
-          .map((paneId) => getPane(paneId))
-      );
+    if (thisPanePreviewing && previewPane.isShow()) {
+      panesToConsider = thisPaneIds
+        .filter((paneId) => (paneId !== thisPanePreviewing.getId()))
+        .map((paneId) => getPane(paneId))
+        .filter((pane) => pane.isShow());
       for (let i = 0; i < panesToConsider.length; i += 1) {
         if (isTwoPanesCollided(previewPane, panesToConsider[i])) {
           return true;

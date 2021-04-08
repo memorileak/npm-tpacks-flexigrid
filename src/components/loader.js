@@ -63,12 +63,18 @@ function makePaneInstancesObjectFromPaneBluePrintsObject(paneBluePrintsObject) {
 
 function makePaneInstanceFromPaneBluePrint(paneBluePrint) {
   if (paneBluePrint) {
-    return flexiPane({
+    const paneInstance = flexiPane({
       xByGridCell: paneBluePrint.xByGridCell,
       yByGridCell: paneBluePrint.yByGridCell,
       widthByGridCell: paneBluePrint.widthByGridCell,
       heightByGridCell: paneBluePrint.heightByGridCell,
     });
+    if (paneBluePrint.show) {
+      paneInstance.show();
+    } else {
+      paneInstance.hide();
+    }
+    return paneInstance;
   }
   return null
 }
