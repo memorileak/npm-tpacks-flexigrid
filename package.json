@@ -1,6 +1,6 @@
 {
   "name": "@tpacks/flexigrid",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A library helps you make a grid with resizable and movable panes on it, just like Kibana dashboard",
   "scripts": {
     "test": "jest"
